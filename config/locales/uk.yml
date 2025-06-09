@@ -121,6 +121,7 @@ uk:
   routes:
     memberships: team
     organizations: organizations
+    user: user
   search:
     index:
       title: Пошук...
