@@ -3,7 +3,7 @@ class OrganizationsController < ApplicationController
   before_action :redirect_to_dashboard, if: -> { Rails.application.config_for(:settings).dig(:only_personal_accounts) }
 
   def index
-    @organizations = current_user.organizations.includes(:users)
+    @pagy, @organizations = pagy(current_user.organizations.includes(:users))
   end
 
   def show

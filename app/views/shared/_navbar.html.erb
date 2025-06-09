@@ -30,28 +30,35 @@
         </button>
       <% end %>
 
+      <div>
+        <%= active_link_to search_path, data: { turbo_frame: :modal, controller: "click", action: "keydown.meta+k@window->click#click keydown.ctrl+k@window->click#click" }, class: "du-input gap-2 cursor-pointer lg:min-w-64" do %>
+          <%= inline_svg_tag "svg/magnifying-glass.svg", class: "size-4" %>
+          <span class="grow hidden lg:block"><%= t("search.index.title") %></span>
+          <kbd class="kbd kbd-sm hidden lg:inline-flex">⌘</kbd>
+          <kbd class="kbd kbd-sm hidden lg:inline-flex">K</kbd>
+        <% end %>
+      </div>
+
     <% else %>
+      <div>
+        <%= link_to root_path, class: "no-underline" do %>
+          <%= image_tag "logo.png", class: "size-8 lg:hidden" %>
+          <%= image_tag "logo-long.png", class: "w-auto h-8 hidden lg:block" %>
+        <% end %>
+      </div>
       <div class="du-menu du-menu-horizontal">
         <%= nav_link t("static.pricing.title"), pricing_path %>
       </div>
     <% end %>
   </div>
 
-  <%# center %>
-  <% if signed_in? %>
-    <div class="flex items-center gap-2 hidden">
-      <%= active_link_to search_path, data: { turbo_frame: :modal, controller: "click", action: "keydown.meta+k@window->click#click keydown.ctrl+k@window->click#click" }, class: "du-input gap-2 cursor-pointer lg:min-w-64" do %>
-        <%= inline_svg_tag "svg/magnifying-glass.svg", class: "size-4" %>
-        <span class="grow hidden lg:block"><%= t("search.index.title") %></span>
-        <kbd class="kbd kbd-sm hidden lg:inline-flex">⌘</kbd>
-        <kbd class="kbd kbd-sm hidden lg:inline-flex">K</kbd>
-      <% end %>
-    </div>
-  <% end %>
-
   <%# right %>
   <div class="flex items-center gap-2">
     <% if signed_in? %>
+      <% if user_masquerade? %>
+        <%= link_to t("devise.masquerade.back"), back_masquerade_path(current_user), class: "du-btn du-btn-warning du-btn-sm uppercase" %>
+      <% end %>
+
       <% if current_user.admin? %>
         <details class="relative group flex items-center" data-controller="dropdown" data-action="keydown.esc@window->dropdown#close">
           <summary class="inline-flex items-center gap-1 font-medium text-sm cursor-pointer [&::-webkit-details-marker]:hidden">
@@ -63,6 +70,8 @@
             <%= active_link_to "🤑 Profitable", "/profitable", class_active: "du-btn-active", class: "whitespace-nowrap du-btn du-btn-ghost justify-start w-full" %>
             <%= active_link_to "⚙️ Jobs", "/jobs", class_active: "du-btn-active", class: "whitespace-nowrap du-btn du-btn-ghost justify-start w-full" %>
             <%= active_link_to "📊 Analytics", "/analytics", class_active: "du-btn-active", class: "whitespace-nowrap du-btn du-btn-ghost justify-start w-full" %>
+            <%= active_link_to "💾 Active Storage", "/active_storage_dashboard", class_active: "du-btn-active", class: "whitespace-nowrap du-btn du-btn-ghost justify-start w-full" %>
+            <%= active_link_to "👀 Lookbook", "/lookbook", class_active: "du-btn-active", class: "whitespace-nowrap du-btn du-btn-ghost justify-start w-full" if Rails.env.development? %>
           </div>
         </details>
       <% end %>
@@ -82,7 +91,10 @@
         </div>
       </details>
     <% else %>
-      <%= render "devise/shared/oauth_links" %>
+      <div class="du-menu du-menu-horizontal">
+        <%= nav_link t("shared.navigation.login"), new_user_session_path, data: { turbo_frame: :modal } %>
+        <%= nav_link t("shared.navigation.register"), new_user_registration_path, data: { turbo_frame: :modal } %>
+      </div>
     <% end %>
   </div>
 </nav>

@@ -3,7 +3,7 @@ module StaticHelper
     return "" if markdown_text.blank?
 
     render_options = {
-      filter_html: true,
+      filter_html: false,
       hard_wrap: true,
       link_attributes: { target: "_blank", rel: "noopener noreferrer" },
       prettify: true,
@@ -30,7 +30,7 @@ module StaticHelper
     }
 
     markdown = Redcarpet::Markdown.new(renderer, extensions)
-      tag.div(class: "prose dark:prose-invert") do
+      tag.article(class: "prose dark:prose-invert") do
       markdown.render(markdown_text).html_safe
     end
   end
