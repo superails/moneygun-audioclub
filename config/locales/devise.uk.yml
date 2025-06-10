@@ -10,6 +10,7 @@ uk:
           password_placeholder: "Введіть ваш пароль"
           remember_me: "Запам’ятати мене"
           submit: "Увійти"
+          sign_in_with_email: "Увійти через email"
       registrations:
         new:
           title: "Реєстрація"
