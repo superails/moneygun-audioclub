@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  resources :books
+  resources :books, only: [ :index, :show ]
+
   draw :users
   draw :organizations
   draw :admin
