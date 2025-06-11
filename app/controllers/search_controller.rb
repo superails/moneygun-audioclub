@@ -10,5 +10,7 @@ class SearchController < ApplicationController
     else
       Organization.none
     end
+
+    @books = Book.where("title ILIKE ?", "%#{params[:query]}%") if params[:query].present?
   end
 end
