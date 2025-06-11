@@ -78,6 +78,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_10_185554) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "books", force: :cascade do |t|
+    t.string "title"
+    t.jsonb "payload"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "connected_accounts", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "provider"
