@@ -8,27 +8,26 @@
       <% end %>
     </div>
 
-    <% if signed_in? %>
-      <% if Rails.application.config_for(:settings).dig(:only_personal_accounts) %>
-        <div class="du-menu du-menu-horizontal">
-          <%= render "shared/sidebar_links" %>
-          <%= nav_link t("organizations.subscriptions.index.title"), organization_subscriptions_path(current_organization), class: "hidden lg:block", icon: subscription_status_label(current_organization) if Rails.application.credentials.dig(:stripe, :private_key).present? %>
-        </div>
-        <% else %>
-        <button data-action="click->mobile-sidebar#open" class="lg:hidden cursor-pointer inline-flex items-center gap-2">
-          <%= inline_svg_tag "svg/bars-3.svg", class: "size-6" %>
-          <% if current_organization %>
-            <div class="inline-flex items-center gap-2 no-underline">
-              <div>
-                <%= organization_avatar(@organization) %>
-              </div>
-              <div class="truncate">
-                <%= @organization.name %>
-              </div>
+    <% if Rails.application.config_for(:settings).dig(:only_personal_accounts) %>
+      <div class="du-menu du-menu-horizontal">
+        <%= render "shared/sidebar_links" %>
+        <%= nav_link t("organizations.subscriptions.index.title"), organization_subscriptions_path(current_organization), class: "hidden lg:block", icon: subscription_status_label(current_organization) if Rails.application.credentials.dig(:stripe, :private_key).present? %>
+      </div>
+      <% else %>
+      <button data-action="click->mobile-sidebar#open" class="lg:hidden cursor-pointer inline-flex items-center gap-2">
+        <%= inline_svg_tag "svg/bars-3.svg", class: "size-6" %>
+        <% if current_organization %>
+          <div class="inline-flex items-center gap-2 no-underline">
+            <div>
+              <%= organization_avatar(@organization) %>
             </div>
-          <% end %>
-        </button>
-      <% end %>
+            <div class="truncate">
+              <%= @organization.name %>
+            </div>
+          </div>
+        <% end %>
+      </button>
+    <% end %>
 
       <% if false %>
       <div>
@@ -40,11 +39,6 @@
         <% end %>
       </div>
       <% end %>
-    <% else %>
-      <div class="du-menu du-menu-horizontal">
-        <%= nav_link t("static.pricing.title"), pricing_path %>
-      </div>
-    <% end %>
   </div>
 
   <%# right %>

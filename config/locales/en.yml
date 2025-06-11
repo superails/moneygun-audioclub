@@ -307,12 +307,12 @@ en:
   static:
     index:
       title: Home
-    refunds:
-      title: Refunds
     pricing:
       title: Pricing
     privacy:
       title: Privacy
+    refunds:
+      title: Refunds
     terms:
       title: Terms
   users:
