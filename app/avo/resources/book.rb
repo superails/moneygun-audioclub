@@ -13,6 +13,9 @@ class Avo::Resources::Book < Avo::BaseResource
   def fields
     field :id, as: :id
     field :title, as: :text
+    field :thumbnail, as: :external_image do
+      record.thumbnail_url
+    end
     field :payload, as: :code, disabled: true
     field :pdfs, as: :file, attach_many: true
     field :audios, as: :file, attach_many: true
