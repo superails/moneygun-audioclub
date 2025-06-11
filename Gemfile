@@ -59,6 +59,7 @@ group :development do
   gem "web-console"
   gem "nested_scaffold", github: "yshmarov/nested_scaffold", branch: "master"
   gem "i18n-tasks"
+  gem "lookbook", ">= 2.3.9"
 end
 
 group :test do
@@ -69,10 +70,14 @@ end
 
 # active record
 gem "sqids" # for obfuscating IDs
+gem "pagy", "~> 9.3"
+gem "ransack", "~> 4.2"
+gem "active_storage_validations"
 
 # authentication
 gem "devise", "~> 4.9"
 gem "devise_invitable", "~> 2.0"
+gem "devise_masquerade"
 
 # oauth
 gem "omniauth-google-oauth2"
@@ -92,8 +97,13 @@ gem "rails-i18n"
 gem "redcarpet", "~> 3.6"
 
 # admin
+gem "active_storage_dashboard"
 gem "avo", ">= 3.2"
-gem "ransack", "~> 4.2"
+group :avo, optional: true do
+  source "https://packager.dev/avo-hq/" do
+    gem "avo-pro"
+  end
+end
 
 # payments
 gem "pay", "~> 8.0"

@@ -2,7 +2,7 @@
 
 <%= modal do %>
   <%= render PageComponent.new do |component| %>
-    <%= markdown_to_html(File.read(Rails.root.join('app/views/static/refunds.md'))) %>
+    <%= markdown_to_html(File.read(Rails.root.join("app/views/static/refunds.md"))) %>
   <% end %>
 <% end %>
 

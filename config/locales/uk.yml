@@ -1,3 +1,4 @@
+---
 uk:
   activerecord:
     attributes:
@@ -36,13 +37,13 @@ uk:
       success: Запит на участь відхилено
     success: Запит на доступ успішно надіслано
   organizations:
+    create:
+      success: Організацію створено
     dashboard:
       index:
         title: Панель керування
       paywalled_page:
         title: Доступ
-    create:
-      success: Організацію створено
     destroy:
       success: Організацію видалено
     edit:
@@ -98,7 +99,7 @@ uk:
         current_plan: Поточний план
         save_yearly: Найкраща цінність
         subscribe: Почати
-        title: 👑 VIP доступ
+        title: "👑 VIP доступ"
     transfers:
       show:
         title: Передача власності
@@ -121,6 +122,7 @@ uk:
   routes:
     memberships: team
     organizations: organizations
+    user: user
   search:
     index:
       title: Пошук...
@@ -144,12 +146,12 @@ uk:
   static:
     index:
       title: Головна
-    refunds:
-      title: Повернення коштів
     pricing:
-      title: 👑 VIP доступ
+      title: "👑 VIP доступ"
     privacy:
       title: Конфіденційність
+    refunds:
+      title: Повернення коштів
     terms:
       title: Умови
   users:

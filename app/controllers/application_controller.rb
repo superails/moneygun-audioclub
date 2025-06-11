@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   # allow_browser versions: :modern
 
-  layout :determine_layout
+  include Pagy::Backend
 
   before_action :set_current_organizations, if: :user_signed_in?
   before_action :current_organization, if: :signed_in?
@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
   include Authentication
   include Authorization
   include Analytics
+  include Translation
 
   def current_organization
     Current.membership&.organization
@@ -24,10 +25,6 @@ class ApplicationController < ActionController::Base
   end
 
   private
-
-  def determine_layout
-    user_signed_in? ? "application" : "marketing"
-  end
 
   def current_organization
     return unless Rails.application.config_for(:settings).dig(:only_personal_accounts)
