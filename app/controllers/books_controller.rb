@@ -2,7 +2,7 @@ class BooksController < ApplicationController
   before_action :set_book, only: [ :show ]
 
   def index
-    @books = Book.all
+    @books = Book.where.not(payload: nil)
   end
 
   def show

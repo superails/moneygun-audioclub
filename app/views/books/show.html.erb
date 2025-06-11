@@ -1,7 +1,9 @@
 <% content_for :title, @book.title %>
 
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-  <div class="container mx-auto px-4 py-8">
-    <%= render @book %>
-  </div>
+<div class="mb-4 text-xs text-base-content/50">
+  <%= link_to "⬅️ Books", [ @organization, :books ], class: "du-link du-link-hover" %>
 </div>
+
+<%= render PageComponent.new do %>
+  <%= render @book %>
+<% end %>

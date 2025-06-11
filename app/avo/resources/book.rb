@@ -1,5 +1,9 @@
 class Avo::Resources::Book < Avo::BaseResource
   self.title = :title
+  self.external_link = lambda {
+    main_app.book_path(record)
+  }
+
   # self.includes = []
   self.attachments = [ :pdfs, :audios ]
   self.search = {

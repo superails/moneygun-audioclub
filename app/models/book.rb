@@ -5,7 +5,7 @@ class Book < ApplicationRecord
   after_update_commit :fetch_book_data, if: :title_changed?
 
   def thumbnail_url
-    payload.first["thumbnail"]
+    payload&.dig("thumbnail")
   end
 
   has_many_attached :pdfs
