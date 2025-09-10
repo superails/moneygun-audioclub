@@ -22,8 +22,8 @@ shared:
       interval: рік
 production:
   plans:
-    - id: price_1RVrKrLRcgxgTmfQCguQqoIX
-      unit_amount: 2900
+    - id: price_1S5jwLLRcgxgTmfQL3CKcftw
+      unit_amount: 1499
       currency: PLN
       interval: місяць
     - id: price_1RVrL9LRcgxgTmfQlbYLNxKU
