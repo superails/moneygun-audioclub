@@ -1,0 +1,9 @@
+<% content_for :title, @book.title %>
+
+<div class="mb-4 text-xs text-base-content/50">
+  <%= link_to "⬅️ Books", [ @organization, :books ], class: "du-link du-link-hover" %>
+</div>
+
+<%= render PageComponent.new do %>
+  <%= render @book %>
+<% end %>

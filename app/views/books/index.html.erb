@@ -1,0 +1,28 @@
+<% content_for :title, "Books" %>
+
+<%= render PageComponent.new(title: "Books", full_width: true) do |component| %>
+  <div class="table-responsive">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th></th>
+          <th><%= Book.human_attribute_name(:title) %></th>
+        </tr>
+      </thead>
+      <tbody id="books">
+        <% @books.each do |book| %>
+          <tr>
+            <td>
+              <%= link_to "ℹ️", [ @organization, book ], class: "du-btn du-btn-sm du-btn-ghost" %>
+            </td>
+            <td>
+              <%= image_tag book.thumbnail_url, class: "w-10 h-10" if book.thumbnail_url.present? %>
+            </td>
+            <td data-label="<%= Book.human_attribute_name(:title) %>"><%= book.payload&.dig("title") %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

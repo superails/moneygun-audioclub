@@ -1,0 +1,21 @@
+<li>
+  <% path = organization.owner?(current_user) ? organization_path(organization) : public_organization_path(organization) %>
+  <%= link_to path, data: { turbo_frame: :_top }, class: "du-list-row flex items-center gap-3 p-3 hover:bg-base-200 transition-colors" do %>
+    <%= organization_avatar(organization) %>
+    <div class="flex-1">
+      <div class="font-medium">
+        <%= highlight(organization.name, params[:query]) %>
+      </div>
+      <% if organization.respond_to?(:description) && organization.description.present? %>
+        <div class="text-xs uppercase font-semibold opacity-60">
+          <%= truncate(organization.description, length: 50) %>
+        </div>
+      <% elsif organization.respond_to?(:category) && organization.category.present? %>
+        <div class="text-xs uppercase font-semibold opacity-60">
+          <%= organization.category %>
+        </div>
+      <% end %>
+    </div>
+    <%= inline_svg_tag "svg/chevron-right.svg", class: "size-4" %>
+  <% end %>
+</li> 

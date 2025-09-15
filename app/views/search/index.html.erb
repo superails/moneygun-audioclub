@@ -5,24 +5,22 @@
     <% end %>
 
     <%= turbo_frame_tag :results do %>
-      <% if @organizations.present? %>
-        <ul class="du-list bg-base-100 rounded-box shadow-md">
-          <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Organizations</li>
-          <% @organizations.each do |organization| %>
-            <li>
-              <% path = organization.owner?(current_user) ? organization_path(organization) : public_organization_path(organization) %>
-              <%= link_to path, data: { turbo_frame: :_top }, class: "du-list-row flex items-center gap-3 p-3 hover:bg-base-200 transition-colors" do %>
-                <%= organization_avatar(organization) %>
-                <div class="flex-1">
-                  <div class="font-medium">
-                    <%= highlight(organization.name, params[:query]) %>
-                  </div>
-                </div>
-                <%= inline_svg_tag "svg/chevron-right.svg", class: "size-4" %>
-              <% end %>
-            </li>
+      <% if @organizations.present? || @books.present? %>
+        <div class="space-y-4">
+          <% if @organizations.present? %>
+            <ul class="du-list bg-base-100 rounded-box shadow-md">
+              <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Organizations</li>
+              <%= render partial: "organization", collection: @organizations %>
+            </ul>
           <% end %>
-        </ul>
+
+          <% if @books.present? %>
+            <ul class="du-list bg-base-100 rounded-box shadow-md">
+              <li class="p-4 pb-2 text-xs opacity-60 tracking-wide">Books</li>
+              <%= render partial: "book", collection: @books %>
+            </ul>
+          <% end %>
+        </div>
       <% elsif params[:query].present? %>
         <div class="bg-base-100 rounded-box shadow-md p-6 text-center space-y-3">
           <div class="text-base-content/60">
