@@ -9,7 +9,7 @@ module User::Authentication
            :masqueradable,
            :omniauthable, omniauth_providers: Devise.omniauth_configs.keys
 
-    has_many :connected_accounts, dependent: :destroy
+    has_many :connected_accounts, as: :owner, dependent: :destroy
   end
 
   def remember_me

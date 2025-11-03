@@ -1,5 +1,5 @@
 class ConnectedAccount < ApplicationRecord
-  belongs_to :user
+  belongs_to :owner, polymorphic: true
 
   validates :provider, presence: true
   validates :uid, presence: true, uniqueness: { scope: :provider }
@@ -37,25 +37,25 @@ class ConnectedAccount < ApplicationRecord
     payload&.dig("info", "nickname")
   end
 
-  def self.create_or_update_from_omniauth(auth_payload, user)
+  def self.create_or_update_from_omniauth(auth_payload, owner)
     # Check if this OAuth account is already connected to a different user
     existing_account = ConnectedAccount.find_by(
       provider: auth_payload.provider,
       uid: auth_payload.uid
     )
 
-    if existing_account && existing_account.user != user
+    if existing_account && existing_account.owner != owner
       # OAuth account is already connected to a different user
       new_account = ConnectedAccount.new(
         provider: auth_payload.provider,
         uid: auth_payload.uid,
-        user: user
+        owner: owner
       )
       new_account.errors.add(:base, "This #{auth_payload.provider.humanize} account is already connected to another user")
       return new_account
     end
 
-    connected_account = user.connected_accounts.find_or_initialize_by(
+    connected_account = owner.connected_accounts.find_or_initialize_by(
       provider: auth_payload.provider,
       uid: auth_payload.uid
     )
