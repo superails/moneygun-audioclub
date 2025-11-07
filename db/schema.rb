@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_10_185554) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_07_164533) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,7 +79,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_10_185554) do
   end
 
   create_table "connected_accounts", force: :cascade do |t|
-    t.bigint "user_id", null: false
     t.string "provider"
     t.string "uid"
     t.string "access_token"
@@ -88,7 +87,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_10_185554) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "payload"
-    t.index ["user_id"], name: "index_connected_accounts_on_user_id"
+    t.string "owner_type", null: false
+    t.bigint "owner_id", null: false
+    t.index ["owner_type", "owner_id"], name: "index_connected_accounts_on_owner_type_and_owner_id"
   end
 
   create_table "memberships", force: :cascade do |t|
@@ -396,6 +397,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_10_185554) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "telegram_bot_integrations", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "telegram_bot_token", null: false
+    t.text "telegram_webhook_token", null: false
+    t.string "telegram_chat_id", null: false
+    t.jsonb "stripe_price_ids", default: [], null: false
+    t.text "offer_message", null: false
+    t.string "default_language", default: "en", null: false
+    t.string "telegram_bot_username", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_telegram_bot_integrations_on_active"
+    t.index ["telegram_webhook_token"], name: "index_telegram_bot_integrations_on_telegram_webhook_token", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -426,7 +443,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_10_185554) do
   add_foreign_key "access_requests", "users", column: "completed_by"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "connected_accounts", "users"
   add_foreign_key "memberships", "organizations"
   add_foreign_key "memberships", "users"
   add_foreign_key "organizations", "users", column: "owner_id"

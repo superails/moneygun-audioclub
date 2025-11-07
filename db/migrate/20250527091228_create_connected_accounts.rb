@@ -1,7 +1,7 @@
 class CreateConnectedAccounts < ActiveRecord::Migration[8.0]
   def change
     create_table :connected_accounts do |t|
-      t.references :user, null: false, foreign_key: true
+      t.references :owner, null: false, polymorphic: true
       t.string :provider
       t.string :uid
       t.string :access_token

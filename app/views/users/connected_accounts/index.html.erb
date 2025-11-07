@@ -17,7 +17,7 @@
     <% end %>
   <% end %>
 
-  <% available_providers = Devise.omniauth_configs.keys.reject { |provider| ConnectedAccount.where(provider: provider, user: current_user).exists? } %>
+  <% available_providers = Devise.omniauth_configs.keys.reject { |provider| ConnectedAccount.where(provider: provider, owner: current_user).exists? } %>
   <% if available_providers.any? %>
     <%= render PageComponent.new(title: t(".available_connections")) do |component| %>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">

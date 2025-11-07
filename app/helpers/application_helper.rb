@@ -38,7 +38,8 @@ module ApplicationHelper
       en: "🇺🇸",
       es: "🇪🇸",
       uk: "🇺🇦",
-      fr: "🇫🇷"
+      fr: "🇫🇷",
+      ru: "🇷🇺"
     }
     locales[locale.to_sym]
   end

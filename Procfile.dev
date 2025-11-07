@@ -1,4 +1,5 @@
 web: bin/rails server -p=3000
 css: bin/rails tailwindcss:watch
 stripe: stripe listen --forward-to localhost:3000/pay/webhooks/stripe
+stripe_bots: stripe listen --forward-to localhost:3000/stripe/bots/webhooks
 worker: rails solid_queue:start

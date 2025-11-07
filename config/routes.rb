@@ -28,4 +28,7 @@ Rails.application.routes.draw do
   get "refunds", to: "static#refunds"
 
   get "search", to: "search#index"
+
+  post "telegram/bots/webhooks", to: "telegram/bots#create"
+  post "stripe/bots/webhooks", to: "stripe/bots#create"
 end

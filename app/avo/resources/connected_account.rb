@@ -11,7 +11,7 @@ class Avo::Resources::ConnectedAccount < Avo::BaseResource
     field :id, as: :id
     field :provider, disabled: true
     field :uid, as: :text, disabled: true
-    field :user, as: :belongs_to
+    field :owner, as: :polymorphic
     field :payload, as: :code, disabled: true
   end
 end
