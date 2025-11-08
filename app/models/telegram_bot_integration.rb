@@ -9,7 +9,7 @@ class TelegramBotIntegration < ApplicationRecord
 
   # Validations
   validates :name, presence: true
-  validates :telegram_bot_token, presence: true
+  validates :telegram_bot_token, presence: true, uniqueness: true
   validates :telegram_webhook_token, presence: true, uniqueness: true
   validates :telegram_chat_id, presence: true
   validates :telegram_bot_username, format: { with: /\A[a-zA-Z0-9_]{5,32}\z/, message: "must be a valid Telegram bot username (5-32 alphanumeric characters or underscores)" }, allow_blank: true
