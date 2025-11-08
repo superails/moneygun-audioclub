@@ -7,7 +7,7 @@ class Avo::Resources::TelegramBotIntegration < Avo::BaseResource
     query: -> { query.ransack(id_eq: params[:q], name_cont: params[:q], m: "or").result(distinct: false) },
     item: lambda {
       {
-        title: [record.id, record.name].join("/")
+        title: [ record.id, record.name ].join("/")
       }
     }
   }

@@ -192,13 +192,13 @@ class Stripe::BotsController < ApplicationController
         channel_link = telegram_service.get_channel_invite_link
         reply_markup = if channel_link
                          {
-                           inline_keyboard: [[
+                           inline_keyboard: [ [
                              { text: I18n.t("bot.status.open_channel"), url: channel_link }
-                           ]]
+                           ] ]
                          }
-                       else
+        else
                          nil
-                       end
+        end
 
         telegram_service.send_message(
           chat_id: chat_id_for_messages,
@@ -220,9 +220,9 @@ class Stripe::BotsController < ApplicationController
 
         if invite_link
           reply_markup = {
-            inline_keyboard: [[
+            inline_keyboard: [ [
               { text: I18n.t("bot.payment_success.join_button"), url: invite_link }
-            ]]
+            ] ]
           }
 
           telegram_service.send_message(

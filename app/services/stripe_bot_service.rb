@@ -43,13 +43,13 @@ class StripeBotService
     # Use bot username if provided, otherwise use generic Telegram return URL
     return_url = if bot_username.present?
                    "https://t.me/#{bot_username}"
-                 else
+    else
                    "https://t.me"
-                 end
+    end
 
     session_params = {
       mode: checkout_mode,
-      line_items: [{ price: price_id, quantity: 1 }],
+      line_items: [ { price: price_id, quantity: 1 } ],
       success_url: return_url,
       cancel_url: return_url,
       metadata: {

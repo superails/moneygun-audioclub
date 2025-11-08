@@ -94,10 +94,10 @@ class Telegram::BotsController < ApplicationController
     I18n.with_locale(locale_value) do
       # Show customizable offer message with buttons
       reply_markup = {
-        inline_keyboard: [[
+        inline_keyboard: [ [
           { text: t_bot("offer.get_started"), callback_data: "get_started" },
           { text: t_bot("offer.maybe_later"), callback_data: "maybe_later" }
-        ]]
+        ] ]
       }
 
       telegram_service.send_message(
@@ -157,7 +157,7 @@ class Telegram::BotsController < ApplicationController
       interval = format_price_interval(price)
 
       plan_text += "#{currency_symbol}#{amount} - #{interval}\n"
-      inline_keyboard << [{ text: "#{currency_symbol}#{amount} - #{interval}", callback_data: "price_#{price.id}" }]
+      inline_keyboard << [ { text: "#{currency_symbol}#{amount} - #{interval}", callback_data: "price_#{price.id}" } ]
     end
 
     plan_text += "\n#{t_bot('plans.description')}"
@@ -197,9 +197,9 @@ class Telegram::BotsController < ApplicationController
       payment_text = t_bot("payment.terms")
 
       reply_markup = {
-        inline_keyboard: [[
+        inline_keyboard: [ [
           { text: t_bot("payment.complete"), url: checkout_url }
-        ]]
+        ] ]
       }
 
       # Edit the generating message to replace it with payment terms
@@ -233,7 +233,7 @@ class Telegram::BotsController < ApplicationController
         text = t_bot("status.active")
         # Add "Open Channel" button
         channel_link = telegram_service.get_channel_invite_link
-        inline_keyboard << [{ text: t_bot("status.open_channel"), url: channel_link }] if channel_link
+        inline_keyboard << [ { text: t_bot("status.open_channel"), url: channel_link } ] if channel_link
         # Add "Manage Subscription" button with billing portal link
         add_billing_portal_button(status_info, inline_keyboard)
       when :cancelled
@@ -241,7 +241,7 @@ class Telegram::BotsController < ApplicationController
         formatted_date = ends_at ? Time.at(ends_at).strftime("%B %d, %Y") : t_bot("status.ends_at_fallback")
         text = t_bot("status.cancelled", ends_at: formatted_date)
         channel_link = telegram_service.get_channel_invite_link
-        inline_keyboard << [{ text: t_bot("status.open_channel"), url: channel_link }] if channel_link
+        inline_keyboard << [ { text: t_bot("status.open_channel"), url: channel_link } ] if channel_link
         # Add billing portal button for cancelled subscriptions too
         add_billing_portal_button(status_info, inline_keyboard)
       when :expiring
@@ -249,7 +249,7 @@ class Telegram::BotsController < ApplicationController
         formatted_date = ends_at ? Time.at(ends_at).strftime("%B %d, %Y") : t_bot("status.ends_at_fallback")
         text = t_bot("status.expiring", ends_at: formatted_date)
         channel_link = telegram_service.get_channel_invite_link
-        inline_keyboard << [{ text: t_bot("status.open_channel"), url: channel_link }] if channel_link
+        inline_keyboard << [ { text: t_bot("status.open_channel"), url: channel_link } ] if channel_link
         # Add billing portal button for expiring subscriptions
         add_billing_portal_button(status_info, inline_keyboard)
       when :none
@@ -281,9 +281,9 @@ class Telegram::BotsController < ApplicationController
     bot_username = telegram_service.bot_username || bot_integration.telegram_bot_username
     return_url = if bot_username.present?
                    "https://t.me/#{bot_username}"
-                 else
+    else
                    "https://t.me"
-                 end
+    end
 
     # Create billing portal session
     portal_url = stripe_service.create_billing_portal_session(
@@ -292,7 +292,7 @@ class Telegram::BotsController < ApplicationController
     )
 
     # Add button if portal URL was created successfully
-    inline_keyboard << [{ text: t_bot("status.manage_subscription"), url: portal_url }] if portal_url
+    inline_keyboard << [ { text: t_bot("status.manage_subscription"), url: portal_url } ] if portal_url
   rescue StandardError => e
     Rails.logger.error "Failed to create billing portal button: #{e.message}"
     # Continue without the billing portal button
