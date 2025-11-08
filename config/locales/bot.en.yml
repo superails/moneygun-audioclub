@@ -1,81 +1,102 @@
 en:
   bot:
-    offer:
-      get_started: "🚀 Get Started Now"
-      maybe_later: "Maybe Later"
-    plans:
+    # ============================================
+    # SALES FLOW - STEP BY STEP
+    # ============================================
+
+    # STEP 1: Initial Offer (/start command)
+    # Note: The main offer message is stored in bot_integration.offer_message (database)
+    # These are just the button labels:
+    step1_offer:
+      button_get_started: "🚀 Get Started Now"
+      button_maybe_later: "Maybe Later"
+      response_not_ready: |
+        No worries! 😊
+
+        When you're ready, just type /start and we'll be here.
+
+    # STEP 2: Plan Selection
+    # Variables: none
+    step2_plans:
       title: "📦 Choose Your Plan:"
-      monthly: "1 month"
-      yearly: "12 months"
-      description: "💳 Secure payment • 🔄 Cancel anytime • ⚡ Instant access after payment"
-      none_available: "❌ No subscription plans available. Please contact support."
-    payment:
-      generating: "🔒 Generating your secure payment link..."
-      terms: |
-        <b>⚡ Your access will be activated instantly after payment</b>
+      interval_monthly: "1 month"
+      interval_yearly: "12 months"
+      unsubscribe_note: "You can unsubscribe at any time (in the status menu in this chat bot)."
+      error_none_available: "❌ No subscription plans available. Please contact support."
 
-        By completing payment, you agree to our Terms of Service.
+    # STEP 3: Payment
+    # Variables: account_info (format: "@username - First Last" or "@username" or "First Last" or "User"), unsubscribe_note (empty string for one-time payments, formatted with newlines for recurring)
+    step3_payment:
+      message_generating: "🔒 Generating your secure payment link..."
+      message_terms: |
+        ⚡️ Your access will be activated instantly after payment
 
-        💳 <b>Secure payment • Instant access • Cancel anytime</b>
+        Account: %{account_info}
+
+        %{unsubscribe_note}
+      button_complete: "❤️ Complete Payment"
       error_generating: "❌ We're experiencing a temporary issue. Please try again in a moment or contact support if the problem persists."
-      complete: "❤️ Complete Payment"
-    status:
-      active: |
-        ✅ <b>Your subscription is active!</b>
 
-        🎉 You have full access.
-      cancelled: |
-        ⚠️ <b>Your subscription is cancelled</b>
-
-        Your access will continue until %{ends_at}, then your subscription will end.
-      expiring: |
-        ⚠️ <b>Your subscription is expiring</b>
-
-        Your access will end on %{ends_at}.
-      none: |
-        ❌ <b>No active subscription</b>
-
-        Use /start to subscribe and get access.
-      error: |
-        ❌ <b>Unable to check subscription status</b>
-
-        Please try again later or contact support.
-      ends_at_fallback: "the end of your billing period"
-      open_channel: "🎧 Open Channel"
-      manage_subscription: "⚙️ Manage Subscription"
-    not_ready_response: |
-      No worries! 😊
-
-      When you're ready, just type /start and we'll be here.
-    payment_success:
-      already_member: |
+    # STEP 4: Payment Success (after Stripe webhook)
+    # Variables: none (but may include channel_link button)
+    step4_payment_success:
+      message_already_member: |
         🎉 <b>Welcome back!</b>
 
         ✅ Payment confirmed — your access is active!
 
         You're already a member. Happy using! 📚
-      added_directly: |
+      message_added_directly: |
         🎉 <b>Welcome! Your payment is confirmed.</b>
 
         ✅ You've been automatically added!
 
         Start exploring below. Happy using! 📚
-      invite_link: |
+      message_invite_link: |
         🎉 <b>Payment successful! You're in!</b>
 
         ✅ Click the link below to access your exclusive channel:
 
         Your journey starts now! 📚
-      contact_support: |
+      message_contact_support: |
         ✅ <b>Payment confirmed!</b>
 
         To activate your access, please contact our support team — we'll get you set up right away!
-      join_button: "🎧 Access Channel"
-    errors:
-      something_wrong: "❌ Oops! Something unexpected happened. Please try again or contact our support team — we're here to help!"
-    cancel:
-      cancelled: |
+      button_join_channel: "🎧 Access Channel"
+
+    # STEP 5: Status Check (/status command)
+    # Variables: ends_at (date string, optional - uses ends_at_fallback if not provided)
+    step5_status:
+      message_active: |
+        ✅ <b>Your subscription is active!</b>
+
+        🎉 You have full access.
+      message_cancelled: |
+        ⚠️ <b>Your subscription is cancelled</b>
+
+        Your access will continue until %{ends_at}, then your subscription will end.
+      message_expiring: |
+        ⚠️ <b>Your subscription is expiring</b>
+
+        Your access will end on %{ends_at}.
+      message_none: |
+        ❌ <b>No active subscription</b>
+
+        Use /start to subscribe and get access.
+      message_error: |
+        ❌ <b>Unable to check subscription status</b>
+
+        Please try again later or contact support.
+      ends_at_fallback: "the end of your billing period"
+      button_open_channel: "🎧 Open Channel"
+      button_manage_subscription: "⚙️ Manage Subscription"
+
+    # OTHER COMMANDS & ERRORS
+    command_cancel:
+      message: |
         ✅ <b>Cancelled</b>
 
         No problem! When you're ready to join, just type /start and we'll be here.
 
+    errors:
+      something_wrong: "❌ Oops! Something unexpected happened. Please try again or contact our support team — we're here to help!"

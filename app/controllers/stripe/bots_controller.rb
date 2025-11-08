@@ -193,7 +193,7 @@ class Stripe::BotsController < ApplicationController
         reply_markup = if channel_link
                          {
                            inline_keyboard: [ [
-                             { text: I18n.t("bot.status.open_channel"), url: channel_link }
+                             { text: I18n.t("bot.step5_status.button_open_channel"), url: channel_link }
                            ] ]
                          }
         else
@@ -202,7 +202,7 @@ class Stripe::BotsController < ApplicationController
 
         telegram_service.send_message(
           chat_id: chat_id_for_messages,
-          text: I18n.t("bot.payment_success.already_member"),
+          text: I18n.t("bot.step4_payment_success.message_already_member"),
           reply_markup: reply_markup
         )
         return
@@ -212,7 +212,7 @@ class Stripe::BotsController < ApplicationController
         # Successfully added directly
         telegram_service.send_message(
           chat_id: chat_id_for_messages,
-          text: I18n.t("bot.payment_success.added_directly")
+          text: I18n.t("bot.step4_payment_success.message_added_directly")
         )
       else
         # Failed to add directly - provide invite link
@@ -221,20 +221,20 @@ class Stripe::BotsController < ApplicationController
         if invite_link
           reply_markup = {
             inline_keyboard: [ [
-              { text: I18n.t("bot.payment_success.join_button"), url: invite_link }
+              { text: I18n.t("bot.step4_payment_success.button_join_channel"), url: invite_link }
             ] ]
           }
 
           telegram_service.send_message(
             chat_id: chat_id_for_messages,
-            text: I18n.t("bot.payment_success.invite_link"),
+            text: I18n.t("bot.step4_payment_success.message_invite_link"),
             reply_markup: reply_markup
           )
         else
           # Could not get invite link - ask to contact support
           telegram_service.send_message(
             chat_id: chat_id_for_messages,
-            text: I18n.t("bot.payment_success.contact_support")
+            text: I18n.t("bot.step4_payment_success.message_contact_support")
           )
         end
       end

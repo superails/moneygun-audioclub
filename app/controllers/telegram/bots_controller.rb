@@ -95,8 +95,8 @@ class Telegram::BotsController < ApplicationController
       # Show customizable offer message with buttons
       reply_markup = {
         inline_keyboard: [ [
-          { text: t_bot("offer.get_started"), callback_data: "get_started" },
-          { text: t_bot("offer.maybe_later"), callback_data: "maybe_later" }
+          { text: t_bot("step1_offer.button_get_started"), callback_data: "get_started" },
+          { text: t_bot("step1_offer.button_maybe_later"), callback_data: "maybe_later" }
         ] ]
       }
 
@@ -122,7 +122,7 @@ class Telegram::BotsController < ApplicationController
       when "maybe_later"
         telegram_service.send_message(
           chat_id: chat_id,
-          text: t_bot("not_ready_response")
+          text: t_bot("step1_offer.response_not_ready")
         )
       when /^price_(.+)$/
         price_id = Regexp.last_match(1)
@@ -141,13 +141,13 @@ class Telegram::BotsController < ApplicationController
     if prices.empty?
       telegram_service.send_message(
         chat_id: chat_id,
-        text: t_bot("plans.none_available")
+        text: t_bot("step2_plans.error_none_available")
       )
       return
     end
 
     # Build plan selection message with buttons
-    plan_text = "#{t_bot('plans.title')}\n\n"
+    plan_text = "#{t_bot('step2_plans.title')}\n\n"
 
     inline_keyboard = []
 
@@ -160,8 +160,6 @@ class Telegram::BotsController < ApplicationController
       inline_keyboard << [ { text: "#{currency_symbol}#{amount} - #{interval}", callback_data: "price_#{price.id}" } ]
     end
 
-    plan_text += "\n#{t_bot('plans.description')}"
-
     telegram_service.send_message(
       chat_id: chat_id,
       text: plan_text,
@@ -169,16 +167,20 @@ class Telegram::BotsController < ApplicationController
     )
   end
 
-  def handle_price_selection(_callback_query, price_id)
+  def handle_price_selection(callback_query, price_id)
     # Show "Generating payment link..." message
     generating_msg = telegram_service.send_message(
       chat_id: chat_id,
-      text: t_bot("payment.generating")
+      text: t_bot("step3_payment.message_generating")
     )
 
     begin
       # Get bot username from Telegram API (fallback to stored value if API fails)
       bot_username = telegram_service.bot_username || bot_integration.telegram_bot_username
+
+      # Fetch price to check if it's recurring
+      price = stripe_service.fetch_prices([ price_id ]).first
+      is_recurring = price&.recurring.present?
 
       # Create Stripe checkout session
       checkout_url = stripe_service.create_checkout_session(
@@ -189,16 +191,32 @@ class Telegram::BotsController < ApplicationController
       )
 
       unless checkout_url
-        edit_generating_message(generating_msg, t_bot("payment.error_generating"))
+        edit_generating_message(generating_msg, t_bot("step3_payment.error_generating"))
         return
       end
 
+      # Get user account information
+      user_info = callback_query&.dig("from") || {}
+      username = user_info["username"]
+      first_name = user_info["first_name"]
+      last_name = user_info["last_name"]
+
+      account_info = if username
+        name_parts = [ first_name, last_name ].compact.join(" ")
+        name_parts.empty? ? "@#{username}" : "@#{username} - #{name_parts}"
+      else
+        name_parts = [ first_name, last_name ].compact.join(" ")
+        name_parts.empty? ? "User" : name_parts
+      end
+
       # Replace "generating" message with payment terms and button
-      payment_text = t_bot("payment.terms")
+      # Only include unsubscribe note for recurring subscriptions
+      unsubscribe_note = is_recurring ? t_bot("step2_plans.unsubscribe_note") : ""
+      payment_text = t_bot("step3_payment.message_terms", account_info: account_info, unsubscribe_note: unsubscribe_note)
 
       reply_markup = {
         inline_keyboard: [ [
-          { text: t_bot("payment.complete"), url: checkout_url }
+          { text: t_bot("step3_payment.button_complete"), url: checkout_url }
         ] ]
       }
 
@@ -230,32 +248,32 @@ class Telegram::BotsController < ApplicationController
 
       case status_info[:status]
       when :active
-        text = t_bot("status.active")
+        text = t_bot("step5_status.message_active")
         # Add "Open Channel" button
         channel_link = telegram_service.get_channel_invite_link
-        inline_keyboard << [ { text: t_bot("status.open_channel"), url: channel_link } ] if channel_link
+        inline_keyboard << [ { text: t_bot("step5_status.button_open_channel"), url: channel_link } ] if channel_link
         # Add "Manage Subscription" button with billing portal link
         add_billing_portal_button(status_info, inline_keyboard)
       when :cancelled
         ends_at = status_info[:ends_at]
-        formatted_date = ends_at ? Time.at(ends_at).strftime("%B %d, %Y") : t_bot("status.ends_at_fallback")
-        text = t_bot("status.cancelled", ends_at: formatted_date)
+        formatted_date = ends_at ? Time.at(ends_at).strftime("%B %d, %Y") : t_bot("step5_status.ends_at_fallback")
+        text = t_bot("step5_status.message_cancelled", ends_at: formatted_date)
         channel_link = telegram_service.get_channel_invite_link
-        inline_keyboard << [ { text: t_bot("status.open_channel"), url: channel_link } ] if channel_link
+        inline_keyboard << [ { text: t_bot("step5_status.button_open_channel"), url: channel_link } ] if channel_link
         # Add billing portal button for cancelled subscriptions too
         add_billing_portal_button(status_info, inline_keyboard)
       when :expiring
         ends_at = status_info[:ends_at]
-        formatted_date = ends_at ? Time.at(ends_at).strftime("%B %d, %Y") : t_bot("status.ends_at_fallback")
-        text = t_bot("status.expiring", ends_at: formatted_date)
+        formatted_date = ends_at ? Time.at(ends_at).strftime("%B %d, %Y") : t_bot("step5_status.ends_at_fallback")
+        text = t_bot("step5_status.message_expiring", ends_at: formatted_date)
         channel_link = telegram_service.get_channel_invite_link
-        inline_keyboard << [ { text: t_bot("status.open_channel"), url: channel_link } ] if channel_link
+        inline_keyboard << [ { text: t_bot("step5_status.button_open_channel"), url: channel_link } ] if channel_link
         # Add billing portal button for expiring subscriptions
         add_billing_portal_button(status_info, inline_keyboard)
       when :none
-        text = t_bot("status.none")
+        text = t_bot("step5_status.message_none")
       else
-        text = t_bot("status.error")
+        text = t_bot("step5_status.message_error")
       end
 
       reply_markup = inline_keyboard.any? ? { inline_keyboard: inline_keyboard } : nil
@@ -269,7 +287,7 @@ class Telegram::BotsController < ApplicationController
       Rails.logger.error "Failed to get subscription status: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
       telegram_service.send_message(
         chat_id: chat_id,
-        text: t_bot("status.error")
+        text: t_bot("step5_status.message_error")
       )
     end
   end
@@ -292,7 +310,7 @@ class Telegram::BotsController < ApplicationController
     )
 
     # Add button if portal URL was created successfully
-    inline_keyboard << [ { text: t_bot("status.manage_subscription"), url: portal_url } ] if portal_url
+    inline_keyboard << [ { text: t_bot("step5_status.button_manage_subscription"), url: portal_url } ] if portal_url
   rescue StandardError => e
     Rails.logger.error "Failed to create billing portal button: #{e.message}"
     # Continue without the billing portal button
@@ -307,7 +325,7 @@ class Telegram::BotsController < ApplicationController
 
       telegram_service.send_message(
         chat_id: chat_id,
-        text: t_bot("cancel.cancelled")
+        text: t_bot("command_cancel.message")
       )
     end
   end
@@ -353,8 +371,8 @@ class Telegram::BotsController < ApplicationController
     return "one-time" unless price.recurring
 
     case price.recurring.interval
-    when "month" then t_bot("plans.monthly")
-    when "year" then t_bot("plans.yearly")
+    when "month" then t_bot("step2_plans.interval_monthly")
+    when "year" then t_bot("step2_plans.interval_yearly")
     else price.recurring.interval
     end
   end
