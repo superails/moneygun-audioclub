@@ -67,6 +67,7 @@ en:
     # STEP 5: Status Check (/status command)
     # Variables: ends_at (date string, optional - uses ends_at_fallback if not provided)
     step5_status:
+      message_loading: "⏳ Checking your subscription status..."
       message_active: |
         ✅ <b>Your subscription is active!</b>
 
@@ -88,7 +89,8 @@ en:
 
         Please try again later or contact support.
       ends_at_fallback: "the end of your billing period"
-      button_open_channel: "🎧 Open channel"
+      # button_open_channel: "🔓 Open the private channel"
+      button_open_channel: "🎧 Start listening"
       button_manage_subscription: "⚙️ Manage subscription"
 
     # OTHER COMMANDS & ERRORS

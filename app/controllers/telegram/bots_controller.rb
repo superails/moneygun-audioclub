@@ -242,53 +242,59 @@ class Telegram::BotsController < ApplicationController
     locale_value = locale
 
     I18n.with_locale(locale_value) do
-      status_info = stripe_service.get_subscription_status(telegram_user_id: telegram_user_id)
+      # Show loading message first
+      loading_msg = telegram_service.send_message(
+        chat_id: chat_id,
+        text: t_bot("step5_status.message_loading")
+      )
 
-      inline_keyboard = []
+      begin
+        status_info = stripe_service.get_subscription_status(telegram_user_id: telegram_user_id)
 
-      case status_info[:status]
-      when :active
-        text = t_bot("step5_status.message_active")
-        # Add "Open Channel" button
-        channel_link = telegram_service.get_channel_invite_link
-        inline_keyboard << [ { text: t_bot("step5_status.button_open_channel"), url: channel_link } ] if channel_link
-        # Add "Manage Subscription" button with billing portal link
-        add_billing_portal_button(status_info, inline_keyboard)
-      when :cancelled
-        ends_at = status_info[:ends_at]
-        formatted_date = ends_at ? Time.at(ends_at).strftime("%B %d, %Y") : t_bot("step5_status.ends_at_fallback")
-        text = t_bot("step5_status.message_cancelled", ends_at: formatted_date)
-        channel_link = telegram_service.get_channel_invite_link
-        inline_keyboard << [ { text: t_bot("step5_status.button_open_channel"), url: channel_link } ] if channel_link
-        # Add billing portal button for cancelled subscriptions too
-        add_billing_portal_button(status_info, inline_keyboard)
-      when :expiring
-        ends_at = status_info[:ends_at]
-        formatted_date = ends_at ? Time.at(ends_at).strftime("%B %d, %Y") : t_bot("step5_status.ends_at_fallback")
-        text = t_bot("step5_status.message_expiring", ends_at: formatted_date)
-        channel_link = telegram_service.get_channel_invite_link
-        inline_keyboard << [ { text: t_bot("step5_status.button_open_channel"), url: channel_link } ] if channel_link
-        # Add billing portal button for expiring subscriptions
-        add_billing_portal_button(status_info, inline_keyboard)
-      when :none
-        text = t_bot("step5_status.message_none")
-      else
-        text = t_bot("step5_status.message_error")
+        inline_keyboard = []
+
+        case status_info[:status]
+        when :active
+          text = t_bot("step5_status.message_active")
+          # Add "Open Channel" button
+          channel_link = telegram_service.get_channel_invite_link
+          inline_keyboard << [ { text: t_bot("step5_status.button_open_channel"), url: channel_link } ] if channel_link
+          # Add "Manage Subscription" button with billing portal link
+          add_billing_portal_button(status_info, inline_keyboard)
+        when :cancelled
+          ends_at = status_info[:ends_at]
+          formatted_date = ends_at ? Time.at(ends_at).strftime("%B %d, %Y") : t_bot("step5_status.ends_at_fallback")
+          text = t_bot("step5_status.message_cancelled", ends_at: formatted_date)
+          channel_link = telegram_service.get_channel_invite_link
+          inline_keyboard << [ { text: t_bot("step5_status.button_open_channel"), url: channel_link } ] if channel_link
+          # Add billing portal button for cancelled subscriptions too
+          add_billing_portal_button(status_info, inline_keyboard)
+        when :expiring
+          ends_at = status_info[:ends_at]
+          formatted_date = ends_at ? Time.at(ends_at).strftime("%B %d, %Y") : t_bot("step5_status.ends_at_fallback")
+          text = t_bot("step5_status.message_expiring", ends_at: formatted_date)
+          channel_link = telegram_service.get_channel_invite_link
+          inline_keyboard << [ { text: t_bot("step5_status.button_open_channel"), url: channel_link } ] if channel_link
+          # Add billing portal button for expiring subscriptions
+          add_billing_portal_button(status_info, inline_keyboard)
+        when :none
+          text = t_bot("step5_status.message_none")
+        else
+          text = t_bot("step5_status.message_error")
+        end
+
+        reply_markup = inline_keyboard.any? ? { inline_keyboard: inline_keyboard } : nil
+
+        # Edit the loading message with the actual status
+        edit_generating_message(loading_msg, text, reply_markup)
+      rescue StandardError => e
+        Rails.logger.error "Failed to get subscription status: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
+        begin
+          edit_generating_message(loading_msg, t_bot("step5_status.message_error"))
+        rescue StandardError
+          nil
+        end
       end
-
-      reply_markup = inline_keyboard.any? ? { inline_keyboard: inline_keyboard } : nil
-
-      telegram_service.send_message(
-        chat_id: chat_id,
-        text: text,
-        reply_markup: reply_markup
-      )
-    rescue StandardError => e
-      Rails.logger.error "Failed to get subscription status: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
-      telegram_service.send_message(
-        chat_id: chat_id,
-        text: t_bot("step5_status.message_error")
-      )
     end
   end
 
