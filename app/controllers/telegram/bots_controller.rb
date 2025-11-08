@@ -374,7 +374,7 @@ class Telegram::BotsController < ApplicationController
   end
 
   def format_price_interval(price)
-    return "one-time" unless price.recurring
+    return t_bot("step2_plans.interval_one_time") unless price.recurring
 
     case price.recurring.interval
     when "month" then t_bot("step2_plans.interval_monthly")

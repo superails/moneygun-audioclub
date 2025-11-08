@@ -21,6 +21,7 @@ en:
       title: "📦 Choose your plan:"
       interval_monthly: "1 month"
       interval_yearly: "12 months"
+      interval_one_time: "one-time"
       unsubscribe_note: "You can unsubscribe at any time (in the status menu in this chat bot)."
       error_none_available: "❌ No subscription plans available. Please contact support."
 
