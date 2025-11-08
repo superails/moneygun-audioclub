@@ -34,7 +34,7 @@ class StripeBotService
   # Create Stripe checkout session
   # Returns checkout session URL
   # bot_username is optional - defaults to returning to Telegram if not provided
-  def create_checkout_session(price_id:, telegram_user_id:, telegram_chat_id:, bot_username: nil, mode: nil)
+  def create_checkout_session(price_id:, telegram_user_id:, telegram_chat_id:, bot_username: nil, telegram_username: nil, mode: nil)
     price = Stripe::Price.retrieve(price_id)
 
     # Determine mode: 'subscription' for recurring prices, 'payment' for one-time
@@ -47,36 +47,45 @@ class StripeBotService
                    "https://t.me"
     end
 
+    # Build metadata hash
+    metadata = {
+      telegram_user_id: telegram_user_id.to_s,
+      telegram_chat_id: telegram_chat_id.to_s
+    }
+    metadata[:telegram_username] = telegram_username.to_s if telegram_username.present?
+
     session_params = {
       mode: checkout_mode,
       line_items: [ { price: price_id, quantity: 1 } ],
       success_url: return_url,
       cancel_url: return_url,
-      metadata: {
-        telegram_user_id: telegram_user_id.to_s,
-        telegram_chat_id: telegram_chat_id.to_s
-      }
+      metadata: metadata
     }
 
     # Add subscription_data metadata if it's a subscription
     if checkout_mode == "subscription"
       session_params[:subscription_data] = {
-        metadata: {
-          telegram_user_id: telegram_user_id.to_s,
-          telegram_chat_id: telegram_chat_id.to_s
-        }
+        metadata: metadata
       }
     end
 
     # Find or create Stripe customer with Telegram user ID in metadata
     existing_customer = find_customer_by_telegram_id(telegram_user_id: telegram_user_id)
 
-    customer = existing_customer || Stripe::Customer.create(
-      metadata: {
-        telegram_user_id: telegram_user_id.to_s,
-        telegram_chat_id: telegram_chat_id.to_s
-      }
-    )
+    if existing_customer
+      # Update existing customer with username if provided and missing
+      if telegram_username.present? && existing_customer.metadata["telegram_username"].blank?
+        Stripe::Customer.update(
+          existing_customer.id,
+          metadata: existing_customer.metadata.merge(telegram_username: telegram_username.to_s)
+        )
+        existing_customer.metadata["telegram_username"] = telegram_username.to_s
+      end
+      customer = existing_customer
+    else
+      # Create new customer with all metadata including username
+      customer = Stripe::Customer.create(metadata: metadata)
+    end
 
     session_params[:customer] = customer.id
 

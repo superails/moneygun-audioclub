@@ -182,19 +182,6 @@ class Telegram::BotsController < ApplicationController
       price = stripe_service.fetch_prices([ price_id ]).first
       is_recurring = price&.recurring.present?
 
-      # Create Stripe checkout session
-      checkout_url = stripe_service.create_checkout_session(
-        price_id: price_id,
-        telegram_user_id: telegram_user_id,
-        telegram_chat_id: chat_id,
-        bot_username: bot_username
-      )
-
-      unless checkout_url
-        edit_generating_message(generating_msg, t_bot("step3_payment.error_generating"))
-        return
-      end
-
       # Get user account information
       user_info = callback_query&.dig("from") || {}
       username = user_info["username"]
@@ -207,6 +194,20 @@ class Telegram::BotsController < ApplicationController
       else
         name_parts = [ first_name, last_name ].compact.join(" ")
         name_parts.empty? ? "User" : name_parts
+      end
+
+      # Create Stripe checkout session with username
+      checkout_url = stripe_service.create_checkout_session(
+        price_id: price_id,
+        telegram_user_id: telegram_user_id,
+        telegram_chat_id: chat_id,
+        bot_username: bot_username,
+        telegram_username: username
+      )
+
+      unless checkout_url
+        edit_generating_message(generating_msg, t_bot("step3_payment.error_generating"))
+        return
       end
 
       # Replace "generating" message with payment terms and button

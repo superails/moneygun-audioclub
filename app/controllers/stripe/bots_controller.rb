@@ -135,11 +135,11 @@ class Stripe::BotsController < ApplicationController
     return unless invoice.paid
 
     # Get Telegram user ID and chat ID from invoice metadata (from subscription_details)
-    telegram_user_id = invoice.subscription_details&.dig("metadata", "telegram_user_id") ||
+    telegram_user_id = invoice.subscription_details&.metadata&.[]("telegram_user_id") ||
                        invoice.metadata["telegram_user_id"] ||
                        invoice.lines&.data&.first&.metadata&.[]("telegram_user_id")
 
-    telegram_chat_id = invoice.subscription_details&.dig("metadata", "telegram_chat_id") ||
+    telegram_chat_id = invoice.subscription_details&.metadata&.[]("telegram_chat_id") ||
                        invoice.metadata["telegram_chat_id"] ||
                        invoice.lines&.data&.first&.metadata&.[]("telegram_chat_id")
 
