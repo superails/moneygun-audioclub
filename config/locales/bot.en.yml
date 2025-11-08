@@ -8,8 +8,8 @@ en:
     # Note: The main offer message is stored in bot_integration.offer_message (database)
     # These are just the button labels:
     step1_offer:
-      button_get_started: "🚀 Get Started Now"
-      button_maybe_later: "Maybe Later"
+      button_get_started: "🚀 Get started now"
+      button_maybe_later: "Maybe later"
       response_not_ready: |
         No worries! 😊
 
@@ -18,7 +18,7 @@ en:
     # STEP 2: Plan Selection
     # Variables: none
     step2_plans:
-      title: "📦 Choose Your Plan:"
+      title: "📦 Choose your plan:"
       interval_monthly: "1 month"
       interval_yearly: "12 months"
       unsubscribe_note: "You can unsubscribe at any time (in the status menu in this chat bot)."
@@ -34,7 +34,7 @@ en:
         Account: %{account_info}
 
         %{unsubscribe_note}
-      button_complete: "❤️ Complete Payment"
+      button_complete: "Complete payment ❤️"
       error_generating: "❌ We're experiencing a temporary issue. Please try again in a moment or contact support if the problem persists."
 
     # STEP 4: Payment Success (after Stripe webhook)
@@ -62,7 +62,7 @@ en:
         ✅ <b>Payment confirmed!</b>
 
         To activate your access, please contact our support team — we'll get you set up right away!
-      button_join_channel: "🎧 Access Channel"
+      button_join_channel: "🎧 Access channel"
 
     # STEP 5: Status Check (/status command)
     # Variables: ends_at (date string, optional - uses ends_at_fallback if not provided)
@@ -88,8 +88,8 @@ en:
 
         Please try again later or contact support.
       ends_at_fallback: "the end of your billing period"
-      button_open_channel: "🎧 Open Channel"
-      button_manage_subscription: "⚙️ Manage Subscription"
+      button_open_channel: "🎧 Open channel"
+      button_manage_subscription: "⚙️ Manage subscription"
 
     # OTHER COMMANDS & ERRORS
     command_cancel:
