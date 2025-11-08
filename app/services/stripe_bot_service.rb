@@ -75,9 +75,12 @@ class StripeBotService
     if existing_customer
       # Update existing customer with username if provided and missing
       if telegram_username.present? && existing_customer.metadata["telegram_username"].blank?
+        # Convert Stripe metadata object to hash, then merge
+        existing_metadata = existing_customer.metadata.to_h
+        updated_metadata = existing_metadata.merge(telegram_username: telegram_username.to_s)
         Stripe::Customer.update(
           existing_customer.id,
-          metadata: existing_customer.metadata.merge(telegram_username: telegram_username.to_s)
+          metadata: updated_metadata
         )
         existing_customer.metadata["telegram_username"] = telegram_username.to_s
       end
